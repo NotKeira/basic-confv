@@ -5,7 +5,7 @@ from pathlib import Path
 from v import VERSION
 from ..schemas.analyser import SchemaAnalyser
 from ..schemas.comparator import SchemaComparator
-from ..types import Schema, PartialSchema
+from ..types import Schema, PartialSchema, SchemaPathMap, SchemaPath, ValidationResult
 from ..utils import Utils
 
 
@@ -29,19 +29,19 @@ class ConfvCLI:
         filename = os.path.basename(file_path)
 
         # Map known filenames to schema paths in list.json
-        schema_map = {"package.json": ["javascript", "nodejs", "package.json"],
+        schema_map: SchemaPathMap = {"package.json": ["javascript", "nodejs", "package.json"],
             "nginx.conf": ["webserver", "nginx", "nginx.conf"],
             "docker-compose.yml": ["containers", "docker", "docker-compose.yml"],
             "config.yaml": ["configuration", "yaml", "config.yaml"]}
 
-        schema_path = schema_map.get(filename)
+        schema_path: SchemaPath | None = schema_map.get(filename)
         if not schema_path:
             print(f"❌ No schema mapping found for file: {filename}")
             return None
 
         return self.load_schema_by_path(schema_path)
 
-    def request_schema(self, file_path: str) -> dict[str, dict[str, str]] | None:
+    def request_schema(self, file_path: str) -> Schema | None:
         print("What schema are we using?")
         print("(A) automatic, (anything else = schema name)")
 
@@ -53,19 +53,19 @@ class ConfvCLI:
 
         if schema_input.lower() == "a":
             print("🔍 Detecting schema automatically...")
-            schema_data = self.get_schema_by_filename(file_path)
+            schema_data: Schema | None = self.get_schema_by_filename(file_path)
         else:
             # Manual schema name input - you'll need to map these to paths
-            schema_name_map = {"package": ["javascript", "nodejs", "package.json"],
+            schema_name_map: SchemaPathMap = {"package": ["javascript", "nodejs", "package.json"],
                 "nginx": ["webserver", "nginx", "nginx.conf"],
                 "docker-compose": ["containers", "docker", "docker-compose.yml"],
                 "docker": ["containers", "docker", "docker-compose.yml"],
                 "config": ["configuration", "yaml", "config.yaml"]}
-            schema_path = schema_name_map.get(schema_input.lower())
+            schema_path: SchemaPath | None = schema_name_map.get(schema_input.lower())
             if not schema_path:
                 print(f"❌ Unknown schema name: {schema_input}")
                 return None
-            schema_data = self.load_schema_by_path(schema_path)
+            schema_data: Schema | None = self.load_schema_by_path(schema_path)
 
         if not schema_data:
             print("❌ Schema could not be loaded.")
@@ -76,11 +76,13 @@ class ConfvCLI:
             print("❌ Invalid schema format. Must contain 'required' and 'optional'.")
             return None
 
-        return {"required": {str(k): str(v) for k, v in schema_data["required"].items()},
+        validated_schema: Schema = {"required": {str(k): str(v) for k, v in schema_data["required"].items()},
             "optional": {str(k): str(v) for k, v in schema_data["optional"].items()}}
 
+        return validated_schema
+
     @staticmethod
-    def load_schema_by_path(path: list[str]) -> dict | None:
+    def load_schema_by_path(path: SchemaPath) -> Schema | None:
         """Load schema from list.json using a path like ['javascript', 'nodejs', 'package.json']"""
         schema_file = Path("src/schemas/list.json")
         if not schema_file.is_file():
@@ -109,7 +111,7 @@ class ConfvCLI:
         parsed_config: PartialSchema = self.utils.parse_config(file_path)
 
         print("🔍 Validating against schema...")
-        result = self.comparator.compare_schema(parsed_config, schema)
+        result: ValidationResult = self.comparator.compare_schema(parsed_config, schema)
 
         # Check if any validation issues exist
         has_errors = any(result[key] for key in result if result[key])
@@ -129,6 +131,6 @@ class ConfvCLI:
 
     def run(self):
         file_path = self.request_file()
-        schema = self.request_schema(file_path)
+        schema: Schema | None = self.request_schema(file_path)
         if schema:
             self.validate(file_path, schema)

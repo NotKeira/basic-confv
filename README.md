@@ -15,8 +15,11 @@ A lightweight configuration file validator based on pre-defined schemas. Validat
 ## Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/NotKeira/basic-confv.git
+# Enter the directory
 cd basic-confv
+# Install the dependencies (not that we have any!)
 pip install -r requirements.txt
 ```
 

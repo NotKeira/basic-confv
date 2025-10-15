@@ -1,0 +1,59 @@
+{
+  "javascript": {
+    "nodejs": {
+      "package.json": {
+        "required": {
+          "name": "string",
+          "version": "string",
+          "dependencies": "string[]",
+          "scripts": "string[]"
+        },
+        "optional": {
+          "description": "string"
+        }
+      }
+    }
+  },
+  "webserver": {
+    "nginx": {
+      "nginx.conf": {
+        "required": {
+          "http": "object",
+          "server": "object"
+        },
+        "optional": {
+          "events": "object",
+          "worker_processes": "string"
+        }
+      }
+    }
+  },
+  "containers": {
+    "docker": {
+      "docker-compose.yml": {
+        "required": {
+          "version": "string",
+          "services": "object"
+        },
+        "optional": {
+          "volumes": "object",
+          "networks": "object"
+        }
+      }
+    }
+  },
+  "configuration": {
+    "yaml": {
+      "config.yaml": {
+        "required": {
+          "settings": "object",
+          "enabled": "boolean"
+        },
+        "optional": {
+          "metadata": "object",
+          "logging": "object"
+        }
+      }
+    }
+  }
+}

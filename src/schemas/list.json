@@ -4,12 +4,20 @@
       "package.json": {
         "required": {
           "name": "string",
-          "version": "string",
-          "dependencies": "string[]",
-          "scripts": "string[]"
+          "version": "string"
         },
         "optional": {
-          "description": "string"
+          "description": "string",
+          "dependencies": "object",
+          "devDependencies": "object",
+          "scripts": "object",
+          "main": "string",
+          "author": "string",
+          "license": "string",
+          "keywords": "array",
+          "repository": "object",
+          "bugs": "object",
+          "homepage": "string"
         }
       }
     }
@@ -23,7 +31,10 @@
         },
         "optional": {
           "events": "object",
-          "worker_processes": "string"
+          "worker_processes": "string",
+          "error_log": "string",
+          "pid": "string",
+          "user": "string"
         }
       }
     }
@@ -37,7 +48,9 @@
         },
         "optional": {
           "volumes": "object",
-          "networks": "object"
+          "networks": "object",
+          "configs": "object",
+          "secrets": "object"
         }
       }
     }
@@ -51,7 +64,9 @@
         },
         "optional": {
           "metadata": "object",
-          "logging": "object"
+          "logging": "object",
+          "version": "string",
+          "environment": "string"
         }
       }
     }

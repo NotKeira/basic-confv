@@ -30,9 +30,9 @@ class ConfvCLI:
 
         # Map known filenames to schema paths in list.json
         schema_map: SchemaPathMap = {"package.json": ["javascript", "nodejs", "package.json"],
-            "nginx.conf": ["webserver", "nginx", "nginx.conf"],
-            "docker-compose.yml": ["containers", "docker", "docker-compose.yml"],
-            "config.yaml": ["configuration", "yaml", "config.yaml"]}
+                                     "nginx.conf": ["webserver", "nginx", "nginx.conf"],
+                                     "docker-compose.yml": ["containers", "docker", "docker-compose.yml"],
+                                     "config.yaml": ["configuration", "yaml", "config.yaml"]}
 
         schema_path: SchemaPath | None = schema_map.get(filename)
         if not schema_path:
@@ -57,10 +57,10 @@ class ConfvCLI:
         else:
             # Manual schema name input - you'll need to map these to paths
             schema_name_map: SchemaPathMap = {"package": ["javascript", "nodejs", "package.json"],
-                "nginx": ["webserver", "nginx", "nginx.conf"],
-                "docker-compose": ["containers", "docker", "docker-compose.yml"],
-                "docker": ["containers", "docker", "docker-compose.yml"],
-                "config": ["configuration", "yaml", "config.yaml"]}
+                                              "nginx": ["webserver", "nginx", "nginx.conf"],
+                                              "docker-compose": ["containers", "docker", "docker-compose.yml"],
+                                              "docker": ["containers", "docker", "docker-compose.yml"],
+                                              "config": ["configuration", "yaml", "config.yaml"]}
             schema_path: SchemaPath | None = schema_name_map.get(schema_input.lower())
             if not schema_path:
                 print(f"❌ Unknown schema name: {schema_input}")
@@ -77,7 +77,7 @@ class ConfvCLI:
             return None
 
         validated_schema: Schema = {"required": {str(k): str(v) for k, v in schema_data["required"].items()},
-            "optional": {str(k): str(v) for k, v in schema_data["optional"].items()}}
+                                    "optional": {str(k): str(v) for k, v in schema_data["optional"].items()}}
 
         return validated_schema
 
@@ -114,7 +114,9 @@ class ConfvCLI:
         result: ValidationResult = self.comparator.compare_schema(parsed_config, schema)
 
         # Check if any validation issues exist
-        has_errors = any(result[key] for key in result if result[key])
+        has_errors = bool(
+            result["missing_required"] or result["extra_required"] or result["missing_optional"] or result[
+                "extra_optional"] or result["type_mismatches"])
 
         if not has_errors:
             print("✅ Configuration is valid.")
